@@ -13,6 +13,13 @@ public class player : Photon.MonoBehaviour {
     private float attackCD = 0.1f;     // 攻擊 CD 時間
     private float current_attackCD = 0;    // 當下攻擊 CD 時間
     private float damage = 5f;         // 攻擊傷害
+    /// <summary>
+    public GameObject fireball;
+    public Transform fireballspawm;
+    private bool timerLock = false;//防止計時器計時到之前被呼叫
+    private int count = 0;
+    /// </summary>
+
 
     // Use this for initialization
     void Start () {
@@ -64,6 +71,21 @@ public class player : Photon.MonoBehaviour {
             speed = 2.0f;
         }
 
+        /////////////////////////////power <summary>
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+
+            anim.SetBool("Ispower", true);
+            shoot();
+
+        }
+        else if (Input.GetKeyUp(KeyCode.Q))
+        {
+            anim.SetBool("Ispower", false);
+
+        }
+        ////////////////////////////////////<summary>
+
         // 減少攻擊 CD 時間
         current_attackCD -= Time.deltaTime;
         // attack 攻擊
@@ -93,6 +115,31 @@ public class player : Photon.MonoBehaviour {
             anim.SetBool("Isattack2", false);
         }
     }
+
+    /// <summary>
+    void shoot()
+    {
+        if (timerLock == false)
+        {
+
+            StartCoroutine(delay(2f));//火球CD=2秒
+
+            GameObject fire = (GameObject)Instantiate(fireball, fireballspawm.position, fireballspawm.rotation);
+            fire.GetComponent<Rigidbody>().velocity = fire.transform.forward * 10.0f;
+            Destroy(fire, 3);
+
+        }
+
+
+    }
+    private IEnumerator delay(float time)
+    {
+        timerLock = true;
+        yield return new WaitForSeconds(time);
+        count++;
+        timerLock = false;
+    }
+    /// </summary>
 
     void attack() {
         if (current_attackCD > 0) {
